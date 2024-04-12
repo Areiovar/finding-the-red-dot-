@@ -2,15 +2,8 @@ import cv2
 import numpy as np
 from serial.tools import list_ports
 import pydobot
-#
-#
-# available_ports = list_ports.comports()
-# print(f'available ports: {[x.device for x in available_ports]}')
-# port = available_ports[0].device
-#
-# device = pydobot.Dobot(port=port, verbose=True)
-# (x, y, z, r, j1, j2, j3, j4) = device.pose()
-# device.move_to(x, y, z, r, wait=False)
+
+
 
 class VideoCamera(object):
     def __init__(self):
