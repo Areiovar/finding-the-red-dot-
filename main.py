@@ -18,7 +18,14 @@ def gen(camera):
 
 @app.route('/video_feed')
 def video_feed():
-     return Response(gen(video_stream),
+    def gen():
+        while True:
+            frame = video_stream.get_frame()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+            # Add the following line to print the distance
+            print(video_stream.distance)
+    return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/red_video_feed')
@@ -27,4 +34,4 @@ def red_video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True,port="5000")
+    app.run(host='localhost', debug=True,port="8080")
