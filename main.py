@@ -6,7 +6,6 @@ import cv2
 import numpy as np
 
 app = Flask(__name__)
-
 available_ports = list_ports.comports()
 print(f'available ports: {[x.device for x in available_ports]}')
 COMPort = available_ports[0].device
@@ -49,6 +48,9 @@ class VideoCamera:
             distance_right = frame.shape[1] - self.cx
             distance_top = self.cy
             distance_bottom = frame.shape[0] - self.cy
+            device = pydobot.Dobot(port=COMPort, verbose=False)
+            (x, y, z, r, j1, j2, j3, j4) = device.pose()
+            device.move_to(x + 20, y, z, r, wait=True)
 
             self.x1, self.y1 = center_x - self.cx, center_y - self.cy
             if self.x1 < 0:
@@ -66,8 +68,17 @@ class VideoCamera:
             if self.y1 == 0:
                 to_dot_y = 'equel'
 
-            cv2.putText(frame, f"to dot x1: {to_dot_x} and y1: {to_dot_y}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 0, 255), 2)
-            print(self.x1, self.y1)
+            while self.x1 == 0:
+                #     if x1 > 0:
+                #         device.move_to(x - 5, y, z, r, wait=True)
+                #     elif x1 < 0:
+                #         device.move_to(x + 5, y, z, r, wait=True)
+                #     else:
+                #         device.move_to(x + 20, y, z, r, wait=True)
+                device.move_to(self.x1, y, z, r, wait=True)
+
+            cv2.putText(frame, f"to dot x1: {to_dot_x} and y1: {to_dot_y}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 0, 255), 2)
+            cv2.putText(frame, f"red dot: {self.cx} {self.cy}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 0, 255), 2)
             result = np.hstack((frame, red))
             self.distance = int(np.sqrt((self.cx - center_x) ** 2 + (self.cy - center_y) ** 2))
 
@@ -76,7 +87,7 @@ class VideoCamera:
 
     def get_coords(self):
         return self.x1, self.y1
-    
+
 video_stream = VideoCamera()
 red_video_stream = VideoCamera()
 
@@ -90,13 +101,17 @@ def page():
     (x, y, z, r, j1, j2, j3, j4) = device.pose()
     device.move_to(x + 20, y, z, r, wait=True)
     x1, y1 = video_stream.get_coords()
-    while True:
-        if x1 > 0:
-            device.move_to(x + 20, y, z, r, wait=True)
-        elif x1 < 0:
-            device.move_to(x - 20, y, z, r, wait=True)
-        else:
-            break
+    print(x1, y1)
+    while x1 == 0:
+    #     if x1 > 0:
+    #         device.move_to(x - 5, y, z, r, wait=True)
+    #     elif x1 < 0:
+    #         device.move_to(x + 5, y, z, r, wait=True)
+    #     else:
+    #         device.move_to(x + 20, y, z, r, wait=True)
+        device.move_to(x + 20, y, z, r, wait=True)
+
+
 
     device.close()
     return render_template('index.html')
