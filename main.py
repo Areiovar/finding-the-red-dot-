@@ -6,9 +6,9 @@ import cv2
 import numpy as np
 
 app = Flask(__name__)
-available_ports = list_ports.comports()
-print(f'available ports: {[x.device for x in available_ports]}')
-COMPort = available_ports[0].device
+# available_ports = list_ports.comports()
+# print(f'available ports: {[x.device for x in available_ports]}')
+# COMPort = available_ports[0].device
 
 class VideoCamera:
     def __init__(self):
@@ -48,9 +48,9 @@ class VideoCamera:
             distance_right = frame.shape[1] - self.cx
             distance_top = self.cy
             distance_bottom = frame.shape[0] - self.cy
-            device = pydobot.Dobot(port=COMPort, verbose=False)
-            (x, y, z, r, j1, j2, j3, j4) = device.pose()
-            device.move_to(x + 20, y, z, r, wait=True)
+            # device = pydobot.Dobot(port=COMPort, verbose=False)
+            # (x, y, z, r, j1, j2, j3, j4) = device.pose()
+            # device.move_to(x + 20, y, z, r, wait=True)
 
             self.x1, self.y1 = center_x - self.cx, center_y - self.cy
             if self.x1 < 0:
@@ -67,15 +67,15 @@ class VideoCamera:
                 to_dot_x = 'equel'
             if self.y1 == 0:
                 to_dot_y = 'equel'
-
-            while self.x1 == 0:
+            # 
+            # while self.x1 == 0:
                 #     if x1 > 0:
                 #         device.move_to(x - 5, y, z, r, wait=True)
                 #     elif x1 < 0:
                 #         device.move_to(x + 5, y, z, r, wait=True)
                 #     else:
-                #         device.move_to(x + 20, y, z, r, wait=True)
-                device.move_to(self.x1, y, z, r, wait=True)
+                # #         device.move_to(x + 20, y, z, r, wait=True)
+                # device.move_to(self.x1, y, z, r, wait=True)
 
             cv2.putText(frame, f"to dot x1: {to_dot_x} and y1: {to_dot_y}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 0, 255), 2)
             cv2.putText(frame, f"red dot: {self.cx} {self.cy}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 0, 255), 2)
@@ -93,27 +93,6 @@ red_video_stream = VideoCamera()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-@app.route('/go')
-def page():
-    device = pydobot.Dobot(port=COMPort, verbose=False)
-    (x, y, z, r, j1, j2, j3, j4) = device.pose()
-    device.move_to(x + 20, y, z, r, wait=True)
-    x1, y1 = video_stream.get_coords()
-    print(x1, y1)
-    while x1 == 0:
-    #     if x1 > 0:
-    #         device.move_to(x - 5, y, z, r, wait=True)
-    #     elif x1 < 0:
-    #         device.move_to(x + 5, y, z, r, wait=True)
-    #     else:
-    #         device.move_to(x + 20, y, z, r, wait=True)
-        device.move_to(x + 20, y, z, r, wait=True)
-
-
-
-    device.close()
     return render_template('index.html')
 
 def gen(camera):
